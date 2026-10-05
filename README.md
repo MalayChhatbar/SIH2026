@@ -110,9 +110,7 @@ so no blackouts leak into the alignment fit.
 | Vw14c | 1 km @ ≥55 km/h | 1002 m | 645.7 m | < 100 m | FAIL |
 | Vw14c | 50 m city | 51 m | 9.1 m | < 5 m | FAIL |
 
-## 4. Honest assessment of the current state
-
-We would rather state these plainly than let a reviewer find them.
+## 4. Current limitations and next steps
 
 - **The AI speed model works; the end-to-end benefit does not yet follow.** SpeedNetA
   beats hold-last-speed by 44–62 % (§2), yet M2/M5 (76.53 % median drift) is *worse*
@@ -128,9 +126,9 @@ We would rather state these plainly than let a reviewer find them.
 - **All seven problem-statement scenarios still fail.** Two come close (Vta16 50 m city
   at 5.3 m against a 5 m target; Vw14c 50 m city at 9.1 m). The 1 km scenarios are off by
   4–17×. We are reporting this as preliminary work, not a completed result.
-- **Headroom is in heading, not speed.** The dominant error source is that phone gyro axes
-  are permuted relative to the vehicle frame and the mount loses 15–47 % of true turn rate
-  on rough roads. Robust heading is the next thing to attack.
+- **The remaining bottleneck is heading, not speed.** The dominant error source is that
+  phone gyro axes are permuted relative to the vehicle frame and the mount loses
+  15–47 % of true turn rate on rough roads. Robust heading is the next thing to attack.
 - **`speednet.pt` exposes only `forward`.** It was exported with `torch.jit.trace`, which
   drops the `encode` / `speed_from` submodules that `idr_ai.encode_windows` and
   `speed_track` call, so those two helpers will raise `AttributeError` against the
