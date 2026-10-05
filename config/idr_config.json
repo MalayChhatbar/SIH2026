@@ -1,0 +1,62 @@
+{
+  "version": "disha-v2",
+  "data_mode": "iovnbd",
+  "window": 50,
+  "stride": 5,
+  "channels": 13,
+  "feature_order": [
+    "lin_acc_xyz",
+    "gyro_xyz",
+    "mag_xyz",
+    "|lin|",
+    "|gyro|",
+    "a_fwd_calibrated",
+    "|d mag/dt|"
+  ],
+  "onnx_inputs": {
+    "imu": "(1,50,13) RAW features (normalisation is inside the graph)",
+    "imu_anchor": "(1,50,13) window at the last GNSS fix",
+    "anchor": "(1,3) = [last GNSS speed m/s, age s, valid=1]"
+  },
+  "onnx_outputs": [
+    "speed",
+    "zupt_logit"
+  ],
+  "age_bins": [
+    0,
+    10,
+    30,
+    60,
+    90
+  ],
+  "ekf_sigma_by_age": [
+    1.9545113307275388,
+    2.7026549198397722,
+    3.0990048693717345,
+    3.2081403599725595
+  ],
+  "selected": {
+    "course": "legacy",
+    "map": false,
+    "road_bearing": false
+  },
+  "tuned_params": {
+    "q_pos": 0.2,
+    "q_psi_deg": 8.0,
+    "q_v": 0.35,
+    "q_bg": 5e-05,
+    "q_ba": 0.002,
+    "sig_ai_scale": 1.4,
+    "ai_every": 5.0,
+    "sig_floor_deg": 2.0,
+    "curve_k": 0.25,
+    "course_mode": "delayed",
+    "map_sig_xt": 12.0,
+    "map_sig_head": 10.0,
+    "map_conf_min": 0.9,
+    "map_after_s": 3.0,
+    "map_every": 10.0,
+    "map_gate": 30.0,
+    "map_use_heading": 0.0
+  }
+}

@@ -1,33 +1,29 @@
-# SIH 26168 - IDR MVP results summary (IO-VNBD, held-out journeys)
+# SIH 26168 - DISHA IDR v2 results (IO-VNBD, held-out journeys, calibration frozen before blackouts)
 
-| Journey | Method | 60 s blackout drift (median) | drift % (median) | p90 drift % |
-|---|---|---|---|---|
-| Vta16 | naive integrate |a| (IMU only) | 3423.4 m | 502.54 % | 603.67 % |
-| Vta16 | EKF, no AI modules | 121.3 m | 31.89 % | 46.90 % |
-| Vta16 | AI-DR (IDR) | 1122.4 m | 170.49 % | 217.32 % |
-| Vta16 | AI-DR + map matching | 1070.2 m | 173.24 % | - |
-| Vta29 | naive integrate |a| (IMU only) | 5492.9 m | 680.43 % | 1072.59 % |
-| Vta29 | EKF, no AI modules | 543.8 m | 64.32 % | 146.80 % |
-| Vta29 | AI-DR (IDR) | 848.3 m | 143.70 % | 209.73 % |
-| Vta29 | AI-DR + map matching | 813.2 m | 146.65 % | - |
-| Vtb1 | naive integrate |a| (IMU only) | 4161.5 m | 507.77 % | 718.73 % |
-| Vtb1 | EKF, no AI modules | 491.8 m | 79.18 % | 164.48 % |
-| Vtb1 | AI-DR (IDR) | 1241.4 m | 131.39 % | 202.16 % |
-| Vtb1 | AI-DR + map matching | 1377.8 m | 127.94 % | - |
-| Vw14c | naive integrate |a| (IMU only) | 3425.3 m | 408.23 % | 476.32 % |
-| Vw14c | EKF, no AI modules | 1282.3 m | 207.23 % | 313.55 % |
-| Vw14c | AI-DR (IDR) | 806.8 m | 103.86 % | 141.87 % |
-| Vw14c | AI-DR + map matching | 870.1 m | 117.67 % | - |
+Data mode: **iovnbd**
 
-## Problem-statement scenario checks
+| Method | 60 s windows | median drift % | mean % | p90 % | windows < 10 % | median end error (m) |
+|---|---|---|---|---|---|---|
+| M0 naive integrate |a| | 28 | 611.48 | 640.14 | 981.02 | 0 % | 4184.3 |
+| M1 classical EKF (no AI) | 28 | 130.65 | 431.86 | 1712.86 | 7 % | 979.3 |
+| M1b hold last GNSS speed | 28 | 54.31 | 86.06 | 170.71 | 4 % | 414.8 |
+| M2 + AI speed/ZUPT/R-adapter | 28 | 76.53 | 100.15 | 221.94 | 4 % | 597.1 |
+| M3 + adaptive delayed course | 28 | 111.15 | 128.44 | 246.14 | 0 % | 767.0 |
+| M4 + map-aided EKF (default) | 28 | 31.26 | 80.70 | 217.72 | 21 % | 176.5 |
+| M5 DISHA v2 (selected+tuned) | 28 | 76.53 | 100.15 | 221.94 | 4 % | 597.1 |
 
-| Journey | Scenario | Distance | AI-DR drift | Target | Result |
+## Problem-statement scenarios (M5)
+
+| Journey | Scenario | Distance | End error | Target | Result |
 |---|---|---|---|---|---|
-| Vta16 | 50m-city | 50 m | 248.2 m | < 5 m | FAIL |
-| Vta29 | 1km@60kmph | 1003 m | 978.1 m | < 100 m | FAIL |
-| Vta29 | 50m-city | 50 m | 22.5 m | < 5 m | FAIL |
-| Vw14c | 1km@60kmph | 1002 m | 486.1 m | < 100 m | FAIL |
-| Vw14c | 50m-city | 50 m | 136.3 m | < 5 m | FAIL |
+| Vta16 | 50 m city | 50 m | 5.3 m | < 5 m | FAIL |
+| Vta29 | 50 m city | 50 m | 124.5 m | < 5 m | FAIL |
+| Vta29 | 1 km @ >=55 km/h | 1003 m | 1723.8 m | < 100 m | FAIL |
+| Vtb1 | 1 km @ >=55 km/h | 999 m | 421.9 m | < 100 m | FAIL |
+| Vtb1 | 50 m city | 51 m | 94.1 m | < 5 m | FAIL |
+| Vw14c | 1 km @ >=55 km/h | 1002 m | 645.7 m | < 100 m | FAIL |
+| Vw14c | 50 m city | 51 m | 9.1 m | < 5 m | FAIL |
 
-Full-journey fusion error (no blackout): Vta16 median 119.50 m, Vta29 median 56.92 m, Vtb1 median 46.70 m, Vw14c median 115.01 m
-AI speed model (SpeedNet): val RMSE 2.89 m/s, ZUPT accuracy > 97 %
+AI speed (SpeedNetA) validation RMSE by anchor age [0, 10, 30, 60, 90]: [1.56, 2.16, 2.48, 2.57] m/s (hold-last-speed: [2.79, 5.33, 6.4, 6.69]); ZUPT accuracy 0.979
+ONNX: single file verified vs PyTorch, max diff 5.7e-06; CPU latency 0.20 ms; 200 Hz engine 26,401 steps/s.
+Selected configuration: course=legacy, map-aiding=False, road-bearing=False.
